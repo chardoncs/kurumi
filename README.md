@@ -1,6 +1,6 @@
 # Kurumi.rs
 
-**Kurumi** ("Walnut" in Japanese), is a
+**Kurumi** ("walnut" in Japanese), is a
 minimalistic PDF viewer based on
 [Rust](https://rust-lang.org),
 [GTK4](https://gtk.org),
