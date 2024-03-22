@@ -1,6 +1,7 @@
 # Kurumi.rs
 
-Minimalistic PDF viewer based on
+**Kurumi** ("Walnut" in Japanese), is a
+minimalistic PDF viewer based on
 [Rust](https://rust-lang.org),
 [GTK4](https://gtk.org),
 and [Poppler](https://poppler.freedesktop.org/),
