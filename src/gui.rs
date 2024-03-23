@@ -1,9 +1,9 @@
 use gtk4 as gtk;
 use poppler::Document;
 
-use crate::{constants::APP_ID, error::{Error, ErrorKind}, util::convert_to_url};
+use crate::{constants::{APP_ID, PAGE_GAP}, error::{Error, ErrorKind}, util::{convert_to_url, refresh_dynamic_pages}};
 
-use gtk::{gio::ApplicationFlags, glib, prelude::*, Application, ApplicationWindow, DrawingArea, Window};
+use gtk::{gio::ApplicationFlags, glib, prelude::*, Application, ApplicationWindow, DrawingArea, ScrolledWindow, Window};
 
 /// Open PDF using Poppler
 fn load_pdf_widget(win: &Window, doc: &Document) {
@@ -12,7 +12,7 @@ fn load_pdf_widget(win: &Window, doc: &Document) {
         .orientation(gtk::Orientation::Vertical)
         .halign(gtk::Align::Center)
         .valign(gtk::Align::Center)
-        .spacing(20)
+        .spacing(PAGE_GAP)
         .build();
 
     let total = doc.n_pages();
@@ -21,25 +21,31 @@ fn load_pdf_widget(win: &Window, doc: &Document) {
         let page = doc.page(i).unwrap();
         let (w, h) = page.size();
 
-        let page_canvas = DrawingArea::builder()
+        let da = DrawingArea::builder()
             .width_request(w.ceil() as i32)
             .height_request(h.ceil() as i32)
             .halign(gtk::Align::Center)
             .valign(gtk::Align::Center)
             .build();
         
-        page_canvas.set_draw_func(move |_, ctx, _, _| {
+        da.set_draw_func(move |_, ctx, _, _| {
+            // Fill background
             ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0);
             ctx.rectangle(0.0, 0.0, w, h);
             ctx.fill().unwrap();
 
+            // Render page
             page.render(ctx);
         });
 
-        pager.append(&page_canvas);
+        pager.append(&da);
     }
 
-    win.set_child(Some(&pager));
+    let sw = ScrolledWindow::builder()
+        .child(&pager)
+        .build();
+
+    win.set_child(Some(&sw));
 }
 
 /// Create a new GTK window displaying PDF
