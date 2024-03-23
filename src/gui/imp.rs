@@ -2,7 +2,7 @@ use gtk::{gio::glib, {subclass::prelude::*, ApplicationWindow, CompositeTemplate
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/com/chardon55/kurumi/window.ui")]
-pub struct KurumiMainWindowImpl {
+pub struct KurumiMainWindow {
     #[template_child]
     pub page_container: TemplateChild<ListView>,
     #[template_child]
@@ -12,7 +12,7 @@ pub struct KurumiMainWindowImpl {
 }
 
 #[glib::object_subclass]
-impl ObjectSubclass for KurumiMainWindowImpl {
+impl ObjectSubclass for KurumiMainWindow {
     const NAME: &'static str = "KurumiMainWindow";
     type Type = super::KurumiMainWindow;
     type ParentType = ApplicationWindow;
@@ -26,7 +26,7 @@ impl ObjectSubclass for KurumiMainWindowImpl {
     }
 }
 
-impl ObjectImpl for KurumiMainWindowImpl {
+impl ObjectImpl for KurumiMainWindow {
     fn constructed(&self) {
         self.parent_constructed();
 
@@ -34,8 +34,8 @@ impl ObjectImpl for KurumiMainWindowImpl {
     }
 }
 
-impl WidgetImpl for KurumiMainWindowImpl {}
+impl WidgetImpl for KurumiMainWindow {}
 
-impl WindowImpl for KurumiMainWindowImpl {}
+impl WindowImpl for KurumiMainWindow {}
 
-impl ApplicationWindowImpl for KurumiMainWindowImpl {}
+impl ApplicationWindowImpl for KurumiMainWindow {}

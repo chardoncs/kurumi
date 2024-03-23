@@ -7,7 +7,7 @@ use gtk::{gio::{self, glib::{self, Object}, ApplicationFlags}, prelude::*, Appli
 mod imp;
 
 glib::wrapper! {
-    pub struct KurumiMainWindow(ObjectSubclass<imp::KurumiMainWindowImpl>)
+    pub struct KurumiMainWindow(ObjectSubclass<imp::KurumiMainWindow>)
         @extends gtk::ApplicationWindow, gtk::Window, gtk::Widget,
         @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible,
                     gtk::Buildable, gtk::ConstraintTarget, gtk::Native,
@@ -23,7 +23,7 @@ impl KurumiMainWindow {
 }
 
 /// Open PDF using Poppler
-fn load_pdf_widget(doc: &Document) -> ScrolledWindow {
+fn load_pdf_widget(doc: &Document) {
     let pager = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
         .halign(gtk::Align::Center)
@@ -78,8 +78,6 @@ fn load_pdf_widget(doc: &Document) -> ScrolledWindow {
 
     sw.set_hscrollbar_policy(gtk::PolicyType::Automatic);
     sw.set_vscrollbar_policy(gtk::PolicyType::External);
-
-    sw
 }
 
 fn build_ui(app: &Application) {
@@ -119,9 +117,7 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
 
                 win.first_child().unwrap()
                     .first_child().unwrap()
-                    .downcast_ref::<Window>()
-                    .unwrap()
-                    .set_child(Some(&sw));
+                    .downcast_ref::<Window>().unwrap();
 
                 // Change window title to file path
                 if let Some(file) = files.first() {
