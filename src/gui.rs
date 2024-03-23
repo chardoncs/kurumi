@@ -1,19 +1,50 @@
-use gtk4 as gtk;
 use poppler::Document;
 
-use crate::{constants::{APP_ID, PAGE_GAP}, error::{Error, ErrorKind}, util::{convert_to_url, refresh_dynamic_pages}};
+use crate::{constants::{APP_ID, PAGE_GAP}, error::{Error, ErrorKind}, util::convert_to_url};
 
-use gtk::{gio::ApplicationFlags, glib, prelude::*, Application, ApplicationWindow, DrawingArea, ScrolledWindow, Window};
+use gtk::{gio::{self, glib::{self, Object}, ApplicationFlags}, prelude::*, Application, DrawingArea, EventControllerScroll, EventControllerScrollFlags, ScrolledWindow, Window};
+
+mod imp;
+
+glib::wrapper! {
+    pub struct KurumiMainWindow(ObjectSubclass<imp::KurumiMainWindowImpl>)
+        @extends gtk::ApplicationWindow, gtk::Window, gtk::Widget,
+        @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible,
+                    gtk::Buildable, gtk::ConstraintTarget, gtk::Native,
+                    gtk::Root, gtk::ShortcutManager;
+}
+
+impl KurumiMainWindow {
+    pub fn new(app: &Application) -> Self {
+        Object::builder()
+            .property("application", app)
+            .build()
+    }
+}
 
 /// Open PDF using Poppler
-fn load_pdf_widget(win: &Window, doc: &Document) {
-
+fn load_pdf_widget(doc: &Document) -> ScrolledWindow {
     let pager = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
         .halign(gtk::Align::Center)
         .valign(gtk::Align::Center)
         .spacing(PAGE_GAP)
         .build();
+
+    let ecs = EventControllerScroll::builder()
+        .flags(EventControllerScrollFlags::VERTICAL)
+        .build();
+
+    ecs.connect_scroll_begin(|_| {
+        println!("Scrolling detected.");
+    });
+
+    ecs.connect_scroll(|_, _, _| {
+        println!("Scrolling in progress.");
+        glib::Propagation::Proceed
+    });
+
+    pager.add_controller(ecs);
 
     let total = doc.n_pages();
 
@@ -45,12 +76,22 @@ fn load_pdf_widget(win: &Window, doc: &Document) {
         .child(&pager)
         .build();
 
-    win.set_child(Some(&sw));
+    sw.set_hscrollbar_policy(gtk::PolicyType::Automatic);
+    sw.set_vscrollbar_policy(gtk::PolicyType::External);
+
+    sw
+}
+
+fn build_ui(app: &Application) {
+    KurumiMainWindow::new(app).present();
 }
 
 /// Create a new GTK window displaying PDF
 pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), Error> {
-    
+
+    gio::resources_register_include!("kurumi-ui.gresource")
+        .expect("Register resources loading failed.");
+
     let doc_result = match path {
           Some(path) => Some(
             Document::from_file(convert_to_url(path)?.as_str(), password)
@@ -74,7 +115,13 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
 
         if let Some(win) = app.active_window() {
             if let Some(ref doc) = doc {
-                load_pdf_widget(&win, doc);
+                let sw = load_pdf_widget(doc);
+
+                win.first_child().unwrap()
+                    .first_child().unwrap()
+                    .downcast_ref::<Window>()
+                    .unwrap()
+                    .set_child(Some(&sw));
 
                 // Change window title to file path
                 if let Some(file) = files.first() {
@@ -88,14 +135,7 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
         }
     });
 
-    app.connect_activate(move |app| {
-        let window = ApplicationWindow::builder()
-            .application(app)
-            .title("New window")
-            .build();
-
-        window.present();
-    });
+    app.connect_activate(build_ui);
 
     match app.run() {
         glib::ExitCode::SUCCESS => Ok(()),

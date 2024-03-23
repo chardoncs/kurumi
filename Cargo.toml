@@ -9,6 +9,9 @@ authors = ["Charles Dong"]
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
-gtk4 = { version = "0.8", feature = ["v4_10"] }
+gtk = { package = "gtk4", version = "0.8", feature = ["v4_12"] }
 poppler-rs = "0.23"
 url = "2.5.0"
+
+[build-dependencies]
+glib-build-tools = "0.19"

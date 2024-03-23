@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="KurumiMainWindow" parent="GtkApplicationWindow">
+    <property name="title">Kurumi PDF viewer</property>
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="hscrollbar-policy">automatic</property>
+            <property name="vscrollbar-policy">external</property>
+            <property name="vexpand">true</property>
+            <child>
+              <object class="GtkListView" id="page_container">
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox" id="status_line">
+            <property name="orientation">horizontal</property>
+            <child>
+              <object class="GtkLabel" id="escape_cmd">
+                <property name="hexpand">true</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

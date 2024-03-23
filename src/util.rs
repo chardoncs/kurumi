@@ -1,4 +1,3 @@
-use gtk4 as gtk;
 use poppler::Document;
 
 use std::path::Path;
@@ -45,5 +44,4 @@ pub struct RefreshRecord {
 /// Implementation of dynamic loading of PDF pages within the display
 pub fn refresh_dynamic_pages<'a>(sw: &'a ScrolledWindow, box_: &'a gtk::Box, doc: &'a Document, active_pages: &'a mut Vec<usize>) -> RefreshRecord {
     todo!();
-    let mut adj = sw.vadjustment();
 }
