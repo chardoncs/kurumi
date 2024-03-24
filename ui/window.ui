@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="KurumiMainWindow" parent="GtkApplicationWindow">
-    <property name="title">Kurumi PDF viewer</property>
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkScrolledWindow">
             <property name="hscrollbar-policy">automatic</property>
-            <property name="vscrollbar-policy">external</property>
+            <property name="vscrollbar-policy">automatic</property>
             <property name="vexpand">true</property>
             <child>
               <object class="GtkListView" id="page_container">

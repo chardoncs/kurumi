@@ -1,6 +1,6 @@
 use poppler::Document;
 
-use crate::{constants::APP_ID, error::{gtk_mismatching_error, Error, ErrorKind}, util::convert_to_url};
+use crate::{constants::APP_ID, error::{gtk_mismatching_error, Error, ErrorKind}, util::{convert_to_url, patch_title}};
 
 use gtk::{gio::{self, glib, ApplicationFlags}, prelude::*, Application};
 
@@ -37,13 +37,21 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
         .flags(ApplicationFlags::HANDLES_OPEN)
         .build();
 
-    app.connect_open(move |app, _, _| {
+    app.connect_open(move |app, files, _| {
         app.activate();
 
         if let Some(win) = app.active_window() {
-            win.downcast_ref::<KurumiMainWindow>()
-                .expect(gtk_mismatching_error("kurumi window").as_str())
-                .set_doc(doc.clone());
+            let kmw = win.downcast_ref::<KurumiMainWindow>()
+                .expect(gtk_mismatching_error("kurumi window").as_str());
+
+            kmw.set_doc(doc.clone());
+            kmw.init();
+
+            if let Some(file) = files.first() {
+                if let Some(path_buf) = file.path() {
+                    kmw.set_title(Some(patch_title(path_buf.to_str()).as_str()));
+                }
+            }
         }
     });
 

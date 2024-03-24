@@ -2,7 +2,7 @@ mod imp;
 
 use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, ListItem, NoSelection, SignalListItemFactory};
 
-use crate::error::gtk_mismatching_error;
+use crate::{error::gtk_mismatching_error, util::patch_title};
 
 use super::pdfpage::{PdfPage, PdfPageObject};
 
@@ -18,6 +18,7 @@ impl KurumiMainWindow {
     pub fn new(app: &Application) -> Self {
         Object::builder()
             .property("application", app)
+            .property("title", patch_title(None))
             .build()
     }
 
@@ -42,7 +43,7 @@ impl KurumiMainWindow {
             .set(doc);
     }
 
-    fn setup_pages(&self) {
+    fn setup_page_model(&self) {
         let model = gio::ListStore::new::<PdfPageObject>();
 
         let imp = self.imp();
@@ -98,5 +99,22 @@ impl KurumiMainWindow {
         });
         
         self.imp().page_container.set_factory(Some(&factory));
+    }
+
+    fn load_document(&self) {
+        if let Some(doc) = self.doc() {
+
+            let total_pages = doc.n_pages();
+
+            // Load window models using a dumb but working way ;)
+            for i in 0..total_pages {
+                self.pages().append(&PdfPageObject::new(i));
+            }
+        }
+    }
+
+    pub fn init(&self) {
+        self.setup_factory();
+        self.load_document();
     }
 }

@@ -44,8 +44,6 @@ impl PdfPage {
 
     pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document) {
         let da = self.imp().drawing_area.get();
-        
-        // TODO
 
         if let Some(page) = doc.page(obj.page()) {
             let (width, height) = page.size();
@@ -78,3 +76,4 @@ impl PdfPage {
         }
     }
 }
+

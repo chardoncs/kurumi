@@ -32,3 +32,12 @@ pub fn convert_to_url(path_str: &str) -> Result<Url, Error> {
     })
 }
 
+pub fn patch_title(title: Option<&str>) -> String {
+    let app_name = clap::crate_name!();
+
+    match title {
+        Some(title) => format!("{} \u{2014} {}", title, app_name),
+        None => app_name.to_string(),
+    }
+}
+

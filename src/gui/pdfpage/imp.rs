@@ -1,16 +1,14 @@
 use std::cell::RefCell;
 
-use gtk::{glib::{self, Binding, Properties}, prelude::*, subclass::prelude::*, CompositeTemplate, DrawingArea};
+use gtk::{glib::{self, Properties}, prelude::*, subclass::prelude::*, CompositeTemplate, DrawingArea};
 
 use super::PageData;
 
 #[derive(Properties, Default)]
 #[properties(wrapper_type = super::PdfPageObject)]
 pub struct PdfPageObject {
-    #[property(name = "page", get, type = i32, member = page)]
+    #[property(name = "page", get, set, type = i32, member = page)]
     pub data: RefCell<PageData>,
-
-    pub bindings: RefCell<Vec<Binding>>,
 }
 
 #[glib::object_subclass]

@@ -38,8 +38,7 @@ impl ObjectImpl for KurumiMainWindow {
 
         let obj = self.obj();
 
-        obj.setup_pages();
-        obj.setup_factory();
+        obj.setup_page_model();
     }
 }
 
