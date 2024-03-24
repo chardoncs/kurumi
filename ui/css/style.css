@@ -1,3 +1,8 @@
+.main-window {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #f4f4f4;
+}
+
 /* Status line */
 .status-line {
     background-color: #181818;

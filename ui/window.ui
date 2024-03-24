@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="KurumiMainWindow" parent="GtkApplicationWindow">
+    <style>
+      <class name="main-window" />
+    </style>
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
