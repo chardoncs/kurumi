@@ -1,4 +1,6 @@
-use gtk::{gio::glib, {subclass::prelude::*, ApplicationWindow, CompositeTemplate, Label, ListView}};
+use std::cell::RefCell;
+
+use gtk::{gio::glib, glib::subclass::{object::{ObjectImpl, ObjectImplExt}, types::{ObjectSubclass, ObjectSubclassExt}}, subclass::{application_window::ApplicationWindowImpl, widget::{CompositeTemplateClass, CompositeTemplateInitializingExt, WidgetClassExt, WidgetImpl}, window::WindowImpl}, ApplicationWindow, CompositeTemplate, Label, ListView, TemplateChild};
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/com/chardon55/kurumi/window.ui")]
@@ -9,6 +11,10 @@ pub struct KurumiMainWindow {
     pub status_line: TemplateChild<gtk::Box>,
     #[template_child]
     pub escape_cmd: TemplateChild<Label>,
+
+    pub pages: RefCell<Option<gtk::gio::ListStore>>,
+
+    pub doc: RefCell<Option<poppler::Document>>,
 }
 
 #[glib::object_subclass]
@@ -30,7 +36,10 @@ impl ObjectImpl for KurumiMainWindow {
     fn constructed(&self) {
         self.parent_constructed();
 
-        //let obj = self.obj();
+        let obj = self.obj();
+
+        obj.setup_pages();
+        obj.setup_factory();
     }
 }
 

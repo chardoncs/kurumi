@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="PdfPage" parent="GtkBox">
+    <property name="halign">center</property>
+    <property name="valign">center</property>
+    <child>
+      <object class="GtkDrawingArea" id="drawing_area" />
+    </child>
+  </template>
+</interface>

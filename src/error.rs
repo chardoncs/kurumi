@@ -35,3 +35,6 @@ pub enum ErrorKind {
     UrlParsing,
 }
 
+pub fn gtk_mismatching_error(expected: &str) -> String {
+    format!("GTK object mismatched: expecting a `{}`", expected)
+}
