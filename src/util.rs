@@ -4,15 +4,16 @@ use url::{ParseError, Url};
 
 use crate::error::{Error, ErrorKind};
 
+/// Convert the possible path/URL/URI string to Servo's URL
 pub fn convert_to_url(path_str: &str) -> Result<Url, Error> {
-    // Try parsing the raw string as URL
+    // Try parsing the raw string as URL at first
     Ok(match Url::parse(path_str) {
         // It works!
         Ok(url) => url,
         // Nah...
         Err(err) => {
             if let ParseError::RelativeUrlWithoutBase = err {
-                // Add base to the absolute path
+                // Add local file base (file://) to the absolute path
                 let patched_path = format!(
                     "file://{}",
                     Path::new(path_str)
@@ -26,12 +27,14 @@ pub fn convert_to_url(path_str: &str) -> Result<Url, Error> {
                 Url::parse(patched_path.as_str())
                     .or_else(|err| Err(Error::new(ErrorKind::UrlParsing, err.to_string().as_str())))?
             } else {
+                // No idea how to solve it...
                 Err(Error::new(ErrorKind::UrlParsing, err.to_string().as_str()))?
             }
         }
     })
 }
 
+/// Add suffix to the input title string
 pub fn patch_title(title: Option<&str>) -> String {
     let app_name = clap::crate_name!();
 

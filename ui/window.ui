@@ -20,6 +20,9 @@
         <child>
           <object class="GtkBox" id="status_line">
             <property name="orientation">horizontal</property>
+            <style>
+              <class name="status-line" />
+            </style>
             <child>
               <object class="GtkLabel" id="escape_cmd">
                 <property name="hexpand">true</property>

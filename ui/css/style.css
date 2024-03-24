@@ -1,0 +1,6 @@
+/* Status line */
+.status-line {
+    background-color: #181818;
+    color: #f4f4f4;
+    font-family: monospace;
+}

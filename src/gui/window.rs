@@ -4,7 +4,7 @@ use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types
 
 use crate::{error::gtk_mismatching_error, util::patch_title};
 
-use super::pdfpage::{PdfPage, PdfPageObject};
+use super::{key_binding::BindKeys, pdfpage::{PdfPage, PdfPageObject}};
 
 glib::wrapper! {
     pub struct KurumiMainWindow(ObjectSubclass<imp::KurumiMainWindow>)
@@ -116,5 +116,6 @@ impl KurumiMainWindow {
     pub fn init(&self) {
         self.setup_factory();
         self.load_document();
+        self.bind_keys();
     }
 }
