@@ -1,8 +1,8 @@
 mod imp;
 
-use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, ListItem, NoSelection, SignalListItemFactory};
+use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, EventControllerScroll, EventControllerScrollFlags, ListItem, NoSelection, ScrolledWindow, SignalListItemFactory};
 
-use crate::{error::gtk_mismatching_error, util::patch_title};
+use crate::{error::gtk_mismatching_error, util::{patch_title, pos_percentage}};
 
 use super::{key_binding::BindKeys, pdfpage::{PdfPage, PdfPageObject}};
 
@@ -113,9 +113,49 @@ impl KurumiMainWindow {
         }
     }
 
+    fn load_scroll_event(&self) {
+        let container = self.imp().page_container.get();
+
+        let pos = self.imp().pos_percentage.get();
+
+        let controller = EventControllerScroll::builder()
+            .flags(EventControllerScrollFlags::VERTICAL)
+            .build();
+
+        let adj = container.vadjustment();
+
+        let pos1 = pos.clone();
+
+        controller.connect_scroll(move |_, _, dy| {
+            if dy <= 0.0 {
+                return gtk::glib::Propagation::Proceed;
+            }
+
+            if let Some(adj) = &adj {
+                pos1.set_label(pos_percentage(adj.value(), adj.upper() - adj.lower()).as_str());
+            }
+
+            gtk::glib::Propagation::Proceed
+        });
+
+        container.add_controller(controller);
+
+        container.parent()
+            .and_downcast_ref::<ScrolledWindow>()
+            .expect(gtk_mismatching_error("gtk::ScrolledWindow").as_str())
+            .connect_edge_reached(move |_, pos_type| {
+                match pos_type {
+                    gtk::PositionType::Top => pos.set_label("Top"),
+                    gtk::PositionType::Bottom => pos.set_label("Bot"),
+                    _ => {}
+                }
+            });
+    }
+
     pub fn init(&self) {
         self.setup_factory();
         self.load_document();
         self.bind_keys();
+        self.load_scroll_event();
     }
 }

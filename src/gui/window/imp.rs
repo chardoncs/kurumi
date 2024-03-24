@@ -11,6 +11,10 @@ pub struct KurumiMainWindow {
     pub status_line: TemplateChild<gtk::Box>,
     #[template_child]
     pub escape_cmd: TemplateChild<Label>,
+    #[template_child]
+    pub pos_percentage: TemplateChild<Label>,
+    #[template_child]
+    pub page_info: TemplateChild<Label>,
 
     pub pages: RefCell<Option<gtk::gio::ListStore>>,
 

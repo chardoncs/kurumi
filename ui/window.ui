@@ -20,12 +20,23 @@
         <child>
           <object class="GtkBox" id="status_line">
             <property name="orientation">horizontal</property>
+            <property name="spacing">20</property>
             <style>
               <class name="status-line" />
             </style>
             <child>
               <object class="GtkLabel" id="escape_cmd">
                 <property name="hexpand">true</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="pos_percentage">
+                <property name="label"></property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="page_info">
+                <property name="label">No file</property>
               </object>
             </child>
           </object>

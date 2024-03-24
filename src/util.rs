@@ -44,3 +44,10 @@ pub fn patch_title(title: Option<&str>) -> String {
     }
 }
 
+pub fn pos_percentage(cur: f64, total: f64) -> String {
+    format!("{}%", (cur / total * 100.0).round())
+}
+
+pub fn _page_info(cur: i32, total: i32) -> String {
+    format!("{}/{}", cur, total)
+}
