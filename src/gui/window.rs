@@ -69,8 +69,6 @@ impl KurumiMainWindow {
 
                 let page_fit = check_page_fit(cur_page.size(), (outer_width.into(), outer_height.into()), scale);
 
-                println!("{}{}", outer_width, outer_height);
-
                 if let PageFitKind::Width(new_scale) | PageFitKind::Page(new_scale) = page_fit {
                     scale = new_scale;
                 }
