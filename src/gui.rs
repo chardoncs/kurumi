@@ -1,6 +1,6 @@
 use poppler::Document;
 
-use crate::{constants::APP_ID, error::{gtk_mismatching_error, Error, ErrorKind}, util::{convert_to_url, patch_title}};
+use crate::{constants::APP_ID, error::{Error, ErrorKind}, mismatching_error, util::{convert_to_url, patch_title}};
 
 use gtk::{gdk::Display, gio::{self, glib, ApplicationFlags}, prelude::*, Application, CssProvider};
 
@@ -42,7 +42,7 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
 
         if let Some(win) = app.active_window() {
             let win = win.downcast_ref::<KurumiMainWindow>()
-                .expect(gtk_mismatching_error("kurumi window").as_str());
+                .expect(mismatching_error!("kurumi window"));
 
             win.set_doc(doc.clone());
             win.init();
@@ -66,7 +66,7 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
 fn load_css() {
     let provider = CssProvider::new();
 
-    provider.load_from_string(include_str!("../ui/css/style.css"));
+    provider.load_from_string(include_str!("../ui/viewer.css"));
 
     gtk::style_context_add_provider_for_display(
         &Display::default().expect("Could not connect to a display"),
