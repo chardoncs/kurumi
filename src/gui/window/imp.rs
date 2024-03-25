@@ -2,6 +2,8 @@ use std::cell::RefCell;
 
 use gtk::{gio::glib, glib::subclass::{object::{ObjectImpl, ObjectImplExt}, types::{ObjectSubclass, ObjectSubclassExt}}, subclass::{application_window::ApplicationWindowImpl, widget::{CompositeTemplateClass, CompositeTemplateInitializingExt, WidgetClassExt, WidgetImpl}, window::WindowImpl}, ApplicationWindow, CompositeTemplate, Label, ListView, TemplateChild};
 
+use crate::util::Scale;
+
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/com/chardon55/kurumi/window.ui")]
 pub struct KurumiMainWindow {
@@ -19,6 +21,8 @@ pub struct KurumiMainWindow {
     pub pages: RefCell<Option<gtk::gio::ListStore>>,
 
     pub doc: RefCell<Option<poppler::Document>>,
+
+    pub scale: RefCell<Scale>,
 }
 
 #[glib::object_subclass]

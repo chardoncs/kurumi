@@ -42,11 +42,14 @@ impl PdfPage {
         Object::builder().build()
     }
 
-    pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document) {
+    pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document, scale: f64) {
         let da = self.imp().drawing_area.get();
 
         if let Some(page) = doc.page(obj.page()) {
             let (width, height) = page.size();
+
+            let width = width * scale;
+            let height = height * scale;
 
             da.set_size_request(width.ceil() as i32, height.ceil() as i32);
 
@@ -55,6 +58,8 @@ impl PdfPage {
                 ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0);
                 ctx.rectangle(0.0, 0.0, width, height);
                 ctx.fill().expect("Background filling failed.");
+
+                ctx.scale(scale, scale);
 
                 // Render PDF
                 page.render(ctx);

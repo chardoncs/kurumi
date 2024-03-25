@@ -51,3 +51,36 @@ pub fn pos_percentage(cur: f64, total: f64) -> String {
 pub fn _page_info(cur: i32, total: i32) -> String {
     format!("{}/{}", cur, total)
 }
+
+/// Document scale factor
+///
+/// Wrapper of a float number
+pub struct Scale(f64);
+
+impl Scale {
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+
+    pub fn set_value(&mut self, new_value: f64) {
+        self.0 = new_value;
+    }
+}
+
+impl Default for Scale {
+    fn default() -> Self {
+        Self(1.0)
+    }
+}
+
+impl Into<f32> for Scale {
+    fn into(self) -> f32 {
+        self.value() as f32
+    }
+}
+
+impl Into<f64> for Scale {
+    fn into(self) -> f64 {
+        self.value()
+    }
+}

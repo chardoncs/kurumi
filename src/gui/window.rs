@@ -30,7 +30,7 @@ impl KurumiMainWindow {
             .unwrap()
     }
 
-    fn doc(&self) -> Option<poppler::Document> {
+    pub fn doc(&self) -> Option<poppler::Document> {
         self.imp()
             .doc
             .borrow()
@@ -69,6 +69,8 @@ impl KurumiMainWindow {
                 .set_child(Some(&page));
         });
 
+        let scale = self.imp().scale.borrow().value();
+
         factory.connect_bind(move |_, item| {
             let obj = item
                 .downcast_ref::<ListItem>()
@@ -84,7 +86,7 @@ impl KurumiMainWindow {
                 .and_downcast::<PdfPage>()
                 .expect(mismatching_error!("kurumi page"));
 
-            page.bind(&obj, &doc.clone().unwrap());
+            page.bind(&obj, &doc.clone().unwrap(), scale);
         });
 
         factory.connect_unbind(move |_, item| {
