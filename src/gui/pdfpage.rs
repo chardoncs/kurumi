@@ -7,9 +7,10 @@ glib::wrapper! {
 }
 
 impl PdfPageObject {
-    pub fn new(page: i32) -> Self {
+    pub fn new(page: i32, scale: f64) -> Self {
         Object::builder()
             .property("page", page)
+            .property("scale", scale)
             .build()
     }
 }
@@ -23,6 +24,8 @@ pub struct PageData {
     /// $0$ is the first page;
     /// while $n - 1$ is the last page.
     pub page: i32,
+
+    pub scale: f64,
 }
 
 glib::wrapper! {
@@ -42,24 +45,30 @@ impl PdfPage {
         Object::builder().build()
     }
 
-    pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document, scale: f64) {
+    pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document) {
         let da = self.imp().drawing_area.get();
+
 
         if let Some(page) = doc.page(obj.page()) {
             let (width, height) = page.size();
 
-            let width = width * scale;
-            let height = height * scale;
+            let obj = obj.clone();
 
-            da.set_size_request(width.ceil() as i32, height.ceil() as i32);
+            let scale = obj.scale();
 
-            da.set_draw_func(move |_, ctx, _, _| {
+            da.set_size_request((width * scale).ceil() as i32, (height * scale).ceil() as i32);
+
+            da.set_draw_func(move |da, ctx, _, _| {
+
+                let scale = obj.scale();
+
+                da.set_size_request((width * scale).ceil() as i32, (height * scale).ceil() as i32);
+                ctx.scale(scale, scale);
+
                 // Draw background
                 ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0);
                 ctx.rectangle(0.0, 0.0, width, height);
                 ctx.fill().expect("Background filling failed.");
-
-                ctx.scale(scale, scale);
 
                 // Render PDF
                 page.render(ctx);

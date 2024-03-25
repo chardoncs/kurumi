@@ -2,16 +2,31 @@ use poppler::Document;
 
 use crate::{constants::APP_ID, error::{Error, ErrorKind}, mismatching_error, util::{convert_to_url, patch_title}};
 
-use gtk::{gdk::Display, gio::{self, glib, ApplicationFlags}, prelude::*, Application, CssProvider};
+use gtk::{gdk::Display, gio::{self, glib, ActionEntry, ApplicationFlags, SimpleActionGroup}, prelude::*, Application, CssProvider};
 
 use self::window::KurumiMainWindow;
 
 mod key_binding;
 mod pdfpage;
+mod status_object;
 mod window;
 
 fn build_ui(app: &Application) {
-    KurumiMainWindow::new(app).present();
+    let win = KurumiMainWindow::new(app);
+
+    let action_zoom_in = ActionEntry::builder("zoom-in")
+        .activate(gtk::glib::clone!(@weak win => move |_, _, _| {
+            println!("Zoom in");
+        }))
+        .build();
+
+    let actions = SimpleActionGroup::new();
+
+    actions.add_action_entries([action_zoom_in]);
+
+    win.insert_action_group("window1", Some(&actions));
+
+    win.present();
 }
 
 /// Create a new GTK window displaying PDF
@@ -56,6 +71,8 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
     });
 
     app.connect_activate(build_ui);
+
+    app.set_accels_for_action("window1.zoom-in", &["<Ctrl>Up"]);
 
     match app.run() {
         glib::ExitCode::SUCCESS => Ok(()),

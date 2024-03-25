@@ -1,8 +1,10 @@
 mod imp;
 
-use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, EventControllerScroll, EventControllerScrollFlags, ListItem, NoSelection, ScrolledWindow, SignalListItemFactory};
+use std::borrow::Borrow;
 
-use crate::{mismatching_error, util::{patch_title, pos_percentage}};
+use gtk::{gio, glib::{self, prelude::*, closure_local, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, EventControllerScroll, EventControllerScrollFlags, ListItem, NoSelection, ScrolledWindow, SignalListItemFactory};
+
+use crate::{constants::{SCALE_MAX, SCALE_MIN, ZOOM_FACTOR}, mismatching_error, util::{check_page_fit, format_scale_status, patch_title, percentage, PageFitKind}};
 
 use super::{key_binding::BindKeys, pdfpage::{PdfPage, PdfPageObject}};
 
@@ -43,6 +45,52 @@ impl KurumiMainWindow {
             .set(doc);
     }
 
+    pub fn page_scale(&self) -> f64 {
+        self.imp()
+            .scale
+            .borrow()
+            .get()
+    }
+
+    pub fn set_scale(&self, scale: f64) {
+        let mut scale = scale.min(SCALE_MAX).max(SCALE_MIN);
+
+        if let Some(doc) = self.doc() {
+            if let Some(cur_page) = doc.page(self.imp().cur_page.get()) {
+                let label = &self.imp().scale_percentage;
+                let window = self.imp()
+                    .page_container
+                    .parent()
+                    .and_downcast::<ScrolledWindow>()
+                    .unwrap();
+                
+                let outer_width = window.size(gtk::Orientation::Horizontal);
+                let outer_height = window.size(gtk::Orientation::Vertical);
+
+                let page_fit = check_page_fit(cur_page.size(), (outer_width.into(), outer_height.into()), scale);
+
+                println!("{}{}", outer_width, outer_height);
+
+                if let PageFitKind::Width(new_scale) | PageFitKind::Page(new_scale) = page_fit {
+                    scale = new_scale;
+                }
+
+                label.set_label(format_scale_status(scale, page_fit).as_str());
+            }
+        }
+
+        self.imp()
+            .scale
+            .set(scale);
+    }
+
+    pub fn set_rel_scale<T>(&self, f: T)
+    where
+        T: Fn(f64) -> f64,
+    {
+        self.set_scale(f(self.page_scale()));
+    }
+
     fn setup_page_model(&self) {
         let model = gio::ListStore::new::<PdfPageObject>();
 
@@ -69,8 +117,6 @@ impl KurumiMainWindow {
                 .set_child(Some(&page));
         });
 
-        let scale = self.imp().scale.borrow().value();
-
         factory.connect_bind(move |_, item| {
             let obj = item
                 .downcast_ref::<ListItem>()
@@ -86,7 +132,7 @@ impl KurumiMainWindow {
                 .and_downcast::<PdfPage>()
                 .expect(mismatching_error!("kurumi page"));
 
-            page.bind(&obj, &doc.clone().unwrap(), scale);
+            page.bind(&obj, &doc.clone().unwrap());
         });
 
         factory.connect_unbind(move |_, item| {
@@ -108,11 +154,18 @@ impl KurumiMainWindow {
 
             let total_pages = doc.n_pages();
 
+            let scale = self.imp().scale.get();
+
             // Load window models using a dumb but working way ;)
             for i in 0..total_pages {
-                self.pages().append(&PdfPageObject::new(i));
+                self.pages().append(&PdfPageObject::new(i, scale)); 
             }
         }
+    }
+
+    pub fn reload(&self) {
+        self.pages().remove_all();
+        self.load_document();
     }
 
     fn load_scroll_event(&self) {
@@ -128,16 +181,28 @@ impl KurumiMainWindow {
 
         let pos1 = pos.clone();
 
+        self.connect_closure("zoom", false, closure_local!(|win: KurumiMainWindow, dy: f64| {
+            win.set_rel_scale(|s| s - dy * ZOOM_FACTOR);
+            win.reload();
+        }));
+
+        let win = self.clone();
+
         controller.connect_scroll(move |_, _, dy| {
-            if dy <= 0.0 {
-                return gtk::glib::Propagation::Proceed;
-            }
 
             if let Some(adj) = &adj {
-                pos1.set_label(pos_percentage(adj.value(), adj.upper() - adj.lower()).as_str());
+                pos1.set_label(percentage(adj.value(), adj.upper() - adj.lower()).as_str());
             }
 
-            gtk::glib::Propagation::Proceed
+            let win_imp = win.imp();
+
+            if win_imp.control_stack.get() > 0 {
+                win.emit_by_name::<()>("zoom", &[&dy]);
+
+                gtk::glib::Propagation::Stop
+            } else {
+                gtk::glib::Propagation::Proceed
+            }
         });
 
         container.add_controller(controller);
@@ -161,3 +226,4 @@ impl KurumiMainWindow {
         self.load_scroll_event();
     }
 }
+

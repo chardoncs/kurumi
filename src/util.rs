@@ -2,7 +2,7 @@ use std::path::Path;
 
 use url::{ParseError, Url};
 
-use crate::error::{Error, ErrorKind};
+use crate::{constants::{SCALE_MAX, SCALE_MIN}, error::{Error, ErrorKind}};
 
 /// Convert the possible path/URL/URI string to Servo's URL
 pub fn convert_to_url(path_str: &str) -> Result<Url, Error> {
@@ -44,7 +44,7 @@ pub fn patch_title(title: Option<&str>) -> String {
     }
 }
 
-pub fn pos_percentage(cur: f64, total: f64) -> String {
+pub fn percentage(cur: f64, total: f64) -> String {
     format!("{}%", (cur / total * 100.0).round())
 }
 
@@ -52,35 +52,59 @@ pub fn _page_info(cur: i32, total: i32) -> String {
     format!("{}/{}", cur, total)
 }
 
-/// Document scale factor
-///
-/// Wrapper of a float number
-pub struct Scale(f64);
+#[derive(Debug)]
+pub enum PageFitKind {
+    Page(f64),
+    Width(f64),
+    None,
+}
 
-impl Scale {
-    pub fn value(&self) -> f64 {
-        self.0
-    }
+pub fn check_page_fit(page_size_original: (f64, f64), outer_size: (f64, f64), factor: f64) -> PageFitKind {
+    let (pw0, ph0) = page_size_original;
+    let (w, h) = outer_size;
 
-    pub fn set_value(&mut self, new_value: f64) {
-        self.0 = new_value;
+    let pw = pw0 * factor;
+    let ph = ph0 * factor;
+
+    if ph0 < h && ph >= h {
+        PageFitKind::Page(h / ph0)
+    } else if pw0 < w && pw >= w {
+        PageFitKind::Width(w / pw0)
+    } else {
+        PageFitKind::None
     }
 }
 
-impl Default for Scale {
-    fn default() -> Self {
-        Self(1.0)
-    }
-}
+pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
+    let mut status_list = Vec::<&'static str>::new();
 
-impl Into<f32> for Scale {
-    fn into(self) -> f32 {
-        self.value() as f32
+    if factor >= SCALE_MAX - 0.01 {
+        status_list.push("max");
+    } else if factor <= SCALE_MIN + 0.01 {
+        status_list.push("min");
     }
-}
 
-impl Into<f64> for Scale {
-    fn into(self) -> f64 {
-        self.value()
+    match page_fit {
+        PageFitKind::Width(f) => {
+            status_list.push("fit width");
+            factor = f;
+        }
+        PageFitKind::Page(f) => {
+            status_list.push("fit page");
+            factor = f;
+        }
+        _ => {}
     }
+
+    let suffix = if status_list.is_empty() {
+        "".to_string()
+    } else {
+        format!(" ({})", status_list.join(","))
+    };
+
+    format!(
+        "Zoom: {}{}",
+        percentage(factor, 1.0),
+        suffix,
+    )
 }

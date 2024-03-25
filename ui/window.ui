@@ -33,6 +33,11 @@
               </object>
             </child>
             <child>
+              <object class="GtkLabel" id="scale_percentage">
+                <property name="label"></property>
+              </object>
+            </child>
+            <child>
               <object class="GtkLabel" id="pos_percentage">
                 <property name="label"></property>
               </object>

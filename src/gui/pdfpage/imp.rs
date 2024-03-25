@@ -8,6 +8,7 @@ use super::PageData;
 #[properties(wrapper_type = super::PdfPageObject)]
 pub struct PdfPageObject {
     #[property(name = "page", get, set, type = i32, member = page)]
+    #[property(name = "scale", get, set, type = f64, member = scale)]
     pub data: RefCell<PageData>,
 }
 
