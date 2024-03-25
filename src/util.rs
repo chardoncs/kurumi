@@ -66,9 +66,9 @@ pub fn check_page_fit(page_size_original: (f64, f64), outer_size: (f64, f64), fa
     let pw = pw0 * factor;
     let ph = ph0 * factor;
 
-    if ph0 < h && ph >= h {
+    if ph0 < h && ph > h {
         PageFitKind::Page(h / ph0)
-    } else if pw0 < w && pw >= w {
+    } else if pw0 < w && pw > w {
         PageFitKind::Width(w / pw0)
     } else {
         PageFitKind::None
