@@ -76,11 +76,16 @@ pub fn check_page_fit(page_size_original: (f64, f64), outer_size: (f64, f64), fa
 }
 
 pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
+    static SCALE_MAX_PER: i32 = (SCALE_MAX * 100.0) as i32;
+    static SCALE_MIN_PER: i32 = (SCALE_MIN * 100.0) as i32;
+
     let mut status_list = Vec::<&'static str>::new();
 
-    if factor >= SCALE_MAX - 0.01 {
+    let mut rounded_factor = (factor * 100.0).round() as i32;
+
+    if rounded_factor >= SCALE_MAX_PER {
         status_list.push("max");
-    } else if factor <= SCALE_MIN + 0.01 {
+    } else if rounded_factor <= SCALE_MIN_PER {
         status_list.push("min");
     }
 
@@ -95,6 +100,8 @@ pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
         }
         _ => {}
     }
+    
+    rounded_factor = (factor * 100.0).round() as i32;
 
     let suffix = if status_list.is_empty() {
         "".to_string()
@@ -102,9 +109,13 @@ pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
         format!(" ({})", status_list.join(","))
     };
 
-    format!(
-        "Zoom: {}{}",
-        percentage(factor, 1.0),
-        suffix,
-    )
+    if rounded_factor == 100 {
+        "".to_string()
+    } else {
+        format!(
+            "Zoom: {}%{}",
+            rounded_factor,
+            suffix,
+        )
+    }
 }
