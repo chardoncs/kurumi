@@ -67,9 +67,11 @@ pub fn check_page_fit(page_size_original: (f64, f64), outer_size: (f64, f64), fa
     let ph = ph0 * factor;
 
     if ph0 < h && ph > h {
-        PageFitKind::Page(h / ph0)
+        //PageFitKind::Page(h / ph0)
+        PageFitKind::Page(factor)
     } else if pw0 < w && pw > w {
-        PageFitKind::Width(w / pw0)
+        //PageFitKind::Width(w / pw0)
+        PageFitKind::Width(factor)
     } else {
         PageFitKind::None
     }
@@ -92,13 +94,11 @@ pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
     match page_fit {
         PageFitKind::Width(f) => {
             status_list.push("fit width");
-            // factor = f;
-            // FIXME
+            factor = f;
         }
         PageFitKind::Page(f) => {
             status_list.push("fit page");
-            // factor = f;
-            // FIXME
+            factor = f;
         }
         _ => {}
     }
