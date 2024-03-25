@@ -92,11 +92,13 @@ pub fn format_scale_status(mut factor: f64, page_fit: PageFitKind) -> String {
     match page_fit {
         PageFitKind::Width(f) => {
             status_list.push("fit width");
-            factor = f;
+            // factor = f;
+            // FIXME
         }
         PageFitKind::Page(f) => {
             status_list.push("fit page");
-            factor = f;
+            // factor = f;
+            // FIXME
         }
         _ => {}
     }
