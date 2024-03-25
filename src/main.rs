@@ -7,6 +7,7 @@ mod constants;
 mod cli;
 mod error;
 mod gui;
+mod mode;
 mod util;
 
 fn main() -> Result<(), Error> {

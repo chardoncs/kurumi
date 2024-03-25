@@ -29,6 +29,7 @@
             </style>
             <child>
               <object class="GtkLabel" id="escape_cmd">
+                <property name="halign">start</property>
                 <property name="hexpand">true</property>
               </object>
             </child>
@@ -38,13 +39,14 @@
               </object>
             </child>
             <child>
-              <object class="GtkLabel" id="pos_percentage">
+              <object class="GtkLabel" id="page_info">
                 <property name="label"></property>
               </object>
             </child>
             <child>
-              <object class="GtkLabel" id="page_info">
-                <property name="label">No file</property>
+              <object class="GtkLabel" id="pos_percentage">
+                <property name="halign">end</property>
+                <property name="label">All</property>
               </object>
             </child>
           </object>

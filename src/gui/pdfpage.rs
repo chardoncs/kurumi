@@ -58,11 +58,11 @@ impl PdfPage {
 
             da.set_size_request((width * scale).ceil() as i32, (height * scale).ceil() as i32);
 
-            da.set_draw_func(move |da, ctx, _, _| {
+            // Fake binding of drawing function
+            da.set_draw_func(move |_, ctx, _, _| {
 
                 let scale = obj.scale();
 
-                da.set_size_request((width * scale).ceil() as i32, (height * scale).ceil() as i32);
                 ctx.scale(scale, scale);
 
                 // Draw background
@@ -80,14 +80,6 @@ impl PdfPage {
         let da = self.imp().drawing_area.get();
 
         da.unset_draw_func();
-    }
-
-    pub fn refresh(&self) {
-        let da = self.imp().drawing_area.get();
-
-        if da.is_drawable() {
-            da.queue_draw();
-        }
     }
 }
 

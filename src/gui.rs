@@ -2,7 +2,7 @@ use poppler::Document;
 
 use crate::{constants::APP_ID, error::{Error, ErrorKind}, mismatching_error, util::{convert_to_url, patch_title}};
 
-use gtk::{gdk::Display, gio::{self, glib, ActionEntry, ApplicationFlags, SimpleActionGroup}, prelude::*, Application, CssProvider};
+use gtk::{gdk::Display, gio::{self, glib, ActionEntry, ApplicationFlags, SimpleActionGroup}, glib::subclass::types::ObjectSubclassIsExt, prelude::*, Application, CssProvider};
 
 use self::window::KurumiMainWindow;
 
@@ -48,8 +48,17 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
         .flags(ApplicationFlags::HANDLES_OPEN)
         .build();
 
+    // Load CSS when started up
     app.connect_startup(|_| {
-        load_css();
+        let provider = CssProvider::new();
+
+        provider.load_from_string(include_str!("../ui/viewer.css"));
+
+        gtk::style_context_add_provider_for_display(
+            &Display::default().expect("Could not connect to a display"),
+            &provider,
+            gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+        );
     });
 
     app.connect_open(move |app, files, _| {
@@ -62,9 +71,13 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
             win.set_doc(doc.clone());
             win.init();
 
+
             if let Some(file) = files.first() {
                 if let Some(path_buf) = file.path() {
                     win.set_title(Some(patch_title(path_buf.to_str()).as_str()));
+                    if let Some(file_name_os) = path_buf.file_name() {
+                        win.imp().escape_cmd.set_label(file_name_os.to_str().or(Some("")).unwrap());
+                    }
                 }
             }
         }
@@ -78,16 +91,4 @@ pub fn new_pdf_window(path: Option<&str>, password: Option<&str>) -> Result<(), 
         glib::ExitCode::SUCCESS => Ok(()),
         _ => Err(Error::new(ErrorKind::Window, "Window exited with code 1."))
     }
-}
-
-fn load_css() {
-    let provider = CssProvider::new();
-
-    provider.load_from_string(include_str!("../ui/viewer.css"));
-
-    gtk::style_context_add_provider_for_display(
-        &Display::default().expect("Could not connect to a display"),
-        &provider,
-        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
-    );
 }

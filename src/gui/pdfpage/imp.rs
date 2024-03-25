@@ -1,6 +1,6 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, sync::OnceLock};
 
-use gtk::{glib::{self, Properties}, prelude::*, subclass::prelude::*, CompositeTemplate, DrawingArea};
+use gtk::{glib::{self, prelude::*, subclass::Signal, Properties}, subclass::prelude::*, CompositeTemplate, DrawingArea};
 
 use super::PageData;
 
@@ -43,7 +43,19 @@ impl ObjectSubclass for PdfPage {
     }
 }
 
-impl ObjectImpl for PdfPage {}
+impl ObjectImpl for PdfPage {
+    fn signals() -> &'static [glib::subclass::Signal] {
+        static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+
+        SIGNALS.get_or_init(|| {
+            vec![
+                Signal::builder("scroll-offset")
+                    .param_types([f64::static_type(), f64::static_type()])
+                    .build(),
+            ]
+        })
+    }
+}
 
 impl WidgetImpl for PdfPage {}
 
