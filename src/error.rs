@@ -35,6 +35,10 @@ pub enum ErrorKind {
     UrlParsing,
 }
 
-pub fn gtk_mismatching_error(expected: &str) -> String {
-    format!("GTK object mismatched: expecting a `{}`", expected)
+#[macro_export]
+macro_rules! mismatching_error {
+    ($target:literal) => {
+        concat!("GTK object mismatched: expecting a `", $target, "`")
+    };
 }
+

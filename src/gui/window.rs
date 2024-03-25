@@ -2,7 +2,7 @@ mod imp;
 
 use gtk::{gio, glib::{self, object::Cast, property::PropertySet, subclass::types::ObjectSubclassIsExt, Object}, prelude::*, Application, EventControllerScroll, EventControllerScrollFlags, ListItem, NoSelection, ScrolledWindow, SignalListItemFactory};
 
-use crate::{error::gtk_mismatching_error, util::{patch_title, pos_percentage}};
+use crate::{mismatching_error, util::{patch_title, pos_percentage}};
 
 use super::{key_binding::BindKeys, pdfpage::{PdfPage, PdfPageObject}};
 
@@ -65,24 +65,24 @@ impl KurumiMainWindow {
             let page = PdfPage::new();
 
             item.downcast_ref::<gtk::ListItem>()
-                .expect(gtk_mismatching_error("gtk::ListItem").as_str())
+                .expect(mismatching_error!("gtk::ListItem"))
                 .set_child(Some(&page));
         });
 
         factory.connect_bind(move |_, item| {
             let obj = item
                 .downcast_ref::<ListItem>()
-                .expect(gtk_mismatching_error("gtk::ListItem").as_str())
+                .expect(mismatching_error!("gtk::ListItem"))
                 .item()
                 .and_downcast::<PdfPageObject>()
-                .expect(gtk_mismatching_error("kurumi page model").as_str());
+                .expect(mismatching_error!("kurumi page model"));
 
             let page = item
                 .downcast_ref::<ListItem>()
-                .expect(gtk_mismatching_error("gtk::ListItem").as_str())
+                .expect(mismatching_error!("gtk::ListItem"))
                 .child()
                 .and_downcast::<PdfPage>()
-                .expect(gtk_mismatching_error("kurumi page").as_str());
+                .expect(mismatching_error!("kurumi page"));
 
             page.bind(&obj, &doc.clone().unwrap());
         });
@@ -90,10 +90,10 @@ impl KurumiMainWindow {
         factory.connect_unbind(move |_, item| {
             let page = item
                 .downcast_ref::<ListItem>()
-                .expect(gtk_mismatching_error("gtk::ListItem").as_str())
+                .expect(mismatching_error!("gtk::ListItem"))
                 .child()
                 .and_downcast::<PdfPage>()
-                .expect(gtk_mismatching_error("kurumi page").as_str());
+                .expect(mismatching_error!("kurumi page"));
 
             page.unbind();
         });
@@ -142,7 +142,7 @@ impl KurumiMainWindow {
 
         container.parent()
             .and_downcast_ref::<ScrolledWindow>()
-            .expect(gtk_mismatching_error("gtk::ScrolledWindow").as_str())
+            .expect(mismatching_error!("gtk::ScrolledWindow"))
             .connect_edge_reached(move |_, pos_type| {
                 match pos_type {
                     gtk::PositionType::Top => pos.set_label("Top"),
