@@ -5,6 +5,7 @@ edition = "2021"
 license = "MIT or Apache-2.0"
 description = "Minimalistic PDF viewer based on GTK and Poppler"
 authors = ["Charles Dong"]
+repository = "https://github.com/chardoncs/kurumi.git"
 
 
 [dependencies]
