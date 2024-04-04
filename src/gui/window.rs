@@ -130,7 +130,7 @@ impl KurumiMainWindow {
                 .and_downcast::<PdfPage>()
                 .expect(mismatching_error!("kurumi page"));
 
-            page.bind(&obj, &doc.clone().unwrap());
+            page.activate(&obj, &doc.clone().unwrap());
         });
 
         factory.connect_unbind(move |_, item| {
@@ -141,7 +141,7 @@ impl KurumiMainWindow {
                 .and_downcast::<PdfPage>()
                 .expect(mismatching_error!("kurumi page"));
 
-            page.unbind();
+            page.deactivate();
         });
         
         self.imp().page_container.set_factory(Some(&factory));
@@ -154,10 +154,12 @@ impl KurumiMainWindow {
 
             let scale = self.imp().scale.get();
 
-            // Load window models using a dumb but working way ;)
-            for i in 0..total_pages {
-                self.pages().append(&PdfPageObject::new(i, scale)); 
-            }
+            self.pages().extend_from_slice(
+                (0..total_pages)
+                    .map(|i| PdfPageObject::new(i, scale))
+                    .collect::<Vec<PdfPageObject>>()
+                    .as_ref()
+            );
         }
     }
 

@@ -45,7 +45,7 @@ impl PdfPage {
         Object::builder().build()
     }
 
-    pub fn bind(&self, obj: &PdfPageObject, doc: &poppler::Document) {
+    pub fn activate(&self, obj: &PdfPageObject, doc: &poppler::Document) {
         let da = self.imp().drawing_area.get();
 
 
@@ -58,9 +58,7 @@ impl PdfPage {
 
             da.set_size_request((width * scale).ceil() as i32, (height * scale).ceil() as i32);
 
-            // Fake binding of drawing function
             da.set_draw_func(move |_, ctx, _, _| {
-
                 let scale = obj.scale();
 
                 ctx.scale(scale, scale);
@@ -76,7 +74,7 @@ impl PdfPage {
         }
     }
 
-    pub fn unbind(&self) {
+    pub fn deactivate(&self) {
         let da = self.imp().drawing_area.get();
 
         da.unset_draw_func();

@@ -39,14 +39,14 @@
               </object>
             </child>
             <child>
-              <object class="GtkLabel" id="page_info">
-                <property name="label"></property>
-              </object>
-            </child>
-            <child>
               <object class="GtkLabel" id="pos_percentage">
                 <property name="halign">end</property>
                 <property name="label">All</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="page_info">
+                <property name="label"></property>
               </object>
             </child>
           </object>
