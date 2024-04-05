@@ -16,4 +16,4 @@ License: MIT or Apache-2.0
 
 ## Future of Kurumi?
 
-Currently, I'm rewriting Kurumi using native Rust libraries. Because the complexity of `gtk4-rs` has really cringed me out.
+Currently, I'm rewriting Kurumi using native Rust libraries. Because the complexity of `gtk4-rs` really makes me cringe.
