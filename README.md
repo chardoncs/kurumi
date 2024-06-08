@@ -13,7 +13,3 @@ License: MIT or Apache-2.0
 
 > NOTE: Although GTK and Poppler are licensed under GPL or LGPL, the Rust bindings
 > are licensed under MIT. So there is no license compatibility violation.
-
-## Future of Kurumi?
-
-Currently, I'm rewriting Kurumi using native Rust libraries. Because the complexity of `gtk4-rs` really makes me cringe.
