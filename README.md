@@ -11,5 +11,9 @@ inspired by [Zathura](https://pwmt.org/projects/zathura/).
 
 License: MIT or Apache-2.0
 
-> NOTE: Although GTK and Poppler are licensed under GPL or LGPL, the Rust bindings
+> [!NOTE]
+>
+> Although GTK and Poppler are licensed under GPL or LGPL, the Rust bindings
 > are licensed under MIT. So there is no license compatibility violation.
+>
+> Kurumi uses MIT-licensed [poppler-rs](https://crates.io/crates/poppler-rs) by GNOME.
