@@ -1,5 +1,9 @@
 # Kurumi.rs
 
+> [!WARNING]
+>
+> Please note the project is currently unmaintained and the crate on crates.io has been transferred to [miniex](https://github.com/miniex) for their project with the same name.
+
 **Kurumi is currenly under experimental phase. Don't use it for daily tasks.**
 
 **Kurumi** ("walnut" in Japanese), is a
